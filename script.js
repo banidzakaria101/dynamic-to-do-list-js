@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadTasks();
 
-    function addTask(taskText, save = true) {
-        if (taskText.trim() === "") {
+    function addTask() {
+        const taskText = taskInput.value.trim(); 
+
+        if (taskText === "") {
             alert("Please enter a task.");
             return;
         }
@@ -20,24 +22,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
         removeButton.onclick = function () {
             taskList.removeChild(li);
-            removeFromStorage(taskText); 
+            removeFromStorage(taskText);
         };
 
         li.appendChild(removeButton);
         taskList.appendChild(li);
 
-        if (save) {
-            const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-            storedTasks.push(taskText);
-            localStorage.setItem('tasks', JSON.stringify(storedTasks));
-        }
+        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        storedTasks.push(taskText);
+        localStorage.setItem('tasks', JSON.stringify(storedTasks));
 
         taskInput.value = '';
     }
 
     function loadTasks() {
         const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks.forEach(taskText => addTask(taskText, false)); 
+        storedTasks.forEach(taskText => {
+            taskInput.value = taskText;
+            addTask(); 
+        });
+        taskInput.value = ''; 
     }
 
     function removeFromStorage(taskText) {
@@ -46,13 +50,11 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('tasks', JSON.stringify(storedTasks));
     }
 
-    addButton.addEventListener('click', function () {
-        addTask(taskInput.value);
-    });
+    addButton.addEventListener('click', addTask);
 
     taskInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-            addTask(taskInput.value);
+            addTask();
         }
     });
 });
